@@ -1,35 +1,44 @@
-import { Navbar } from "@/components/navbar"
-import { Hero } from "@/components/hero"
-import { UpcomingEvents } from "@/components/upcoming-events"
-import { Gallery } from "@/components/gallery"
-import { BookingForm } from "@/components/booking-form"
-import { Footer } from "@/components/footer"
+import { Navbar } from "@/components/navbar";
+import Hero from "@/components/hero";
+import { UpcomingEvents } from "@/components/upcoming-events";
+import { Gallery } from "@/components/gallery";
+import { BookingForm } from "@/components/booking-form";
+import { Footer } from "@/components/footer";
+import { getHeroMedia } from "@/lib/events";
 
-export default function Home() {
-  return (
-    <main className="min-h-screen bg-black">
-      <Navbar />
-      <Hero />
+export default async function Home() {
+	const media = (await getHeroMedia()) as {
+		type: "image" | "video";
+		src: string;
+	}[];
 
-      {/* Brand Statement Section */}
-      <section className="py-32 px-6 md:px-12 flex items-center justify-center text-center">
-        <div className="max-w-4xl">
-          <p className="text-2xl md:text-5xl font-serif italic leading-snug">
-            "We don't just host parties; we curate moments that define your lifestyle."
-          </p>
-          <div className="mt-12 flex items-center justify-center gap-4">
-            <div className="h-[1px] w-12 bg-gold/50" />
-            <span className="text-[10px] uppercase tracking-[0.4em] text-gold">Khalid Lifestyle PR</span>
-            <div className="h-[1px] w-12 bg-gold/50" />
-          </div>
-        </div>
-      </section>
+	return (
+		<main className="min-h-screen bg-black">
+			<Navbar />
+			<Hero media={media} />
 
-      <UpcomingEvents />
-      <Gallery />
-      <BookingForm />
+			{/* Brand Statement Section */}
+			<section className="py-32 px-6 md:px-12 flex items-center justify-center text-center">
+				<div className="max-w-4xl">
+					<p className="text-2xl md:text-5xl font-serif italic leading-snug">
+						"We don't just host parties; we curate moments that define your
+						lifestyle."
+					</p>
+					<div className="mt-12 flex items-center justify-center gap-4">
+						<div className="h-px w-12 bg-gold/50" />
+						<span className="text-[10px] uppercase tracking-[0.4em] text-gold">
+							Khalid Lifestyle PR
+						</span>
+						<div className="h-px w-12 bg-gold/50" />
+					</div>
+				</div>
+			</section>
 
-      <Footer />
-    </main>
-  )
+			<UpcomingEvents />
+			<Gallery />
+			<BookingForm />
+
+			<Footer />
+		</main>
+	);
 }
