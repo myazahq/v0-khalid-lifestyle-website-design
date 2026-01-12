@@ -5,13 +5,15 @@ import { Gallery } from "@/components/gallery";
 import { BookingForm } from "@/components/booking-form";
 import { Footer } from "@/components/footer";
 import { getHeroMedia } from "@/lib/events";
+import { getAllEventsFromFirestore } from "@/lib/firestore-services";
 
 export default async function Home() {
+	const eventsData = await getAllEventsFromFirestore();
+
 	const media = (await getHeroMedia()) as {
 		type: "image" | "video";
 		src: string;
 	}[];
-
 	return (
 		<main className="min-h-screen bg-black">
 			<Navbar />
@@ -34,8 +36,8 @@ export default async function Home() {
 				</div>
 			</section>
 
-			<UpcomingEvents />
-			<Gallery />
+			<UpcomingEvents eventsData={eventsData} />
+			<Gallery eventsData={eventsData} />
 			<BookingForm />
 
 			<Footer />

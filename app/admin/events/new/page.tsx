@@ -20,6 +20,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { createEvent } from "@/lib/firestore-services";
 import { uploadImage, validateFileSize } from "@/lib/storage-services";
+import DateInput from "@/components/ui/datePicker";
 
 export default function NewEventPage() {
 	const router = useRouter();
@@ -28,11 +29,13 @@ export default function NewEventPage() {
 		date: "",
 		location: "",
 		description: "",
+		featured: false,
 	});
 	const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 	const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string>("");
+	const [startDate, setStartDate] = useState<Date | null>(new Date());
 
 	const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -68,22 +71,18 @@ export default function NewEventPage() {
 				if (!uploadResult.success || !uploadResult.url) {
 					throw new Error("Failed to upload thumbnail image");
 				}
-
-				console.log(uploadResult);
 				thumbnailUrl = uploadResult.url;
 			}
 
 			// Create event in Firestore
 			const result = await createEvent({
-				id: slug,
 				title: formData.title,
-				date: formData.date,
+				date: startDate,
 				location: formData.location,
 				description: formData.description,
 				thumbnail: thumbnailUrl,
-				items: [],
+				featured: formData.featured,
 			});
-			console.log(result);
 			if (!result.success) {
 				throw new Error("Failed to create event");
 			}
@@ -153,15 +152,9 @@ export default function NewEventPage() {
 								<div className="grid gap-6 md:grid-cols-2">
 									<div className="space-y-2">
 										<Label htmlFor="date">Date</Label>
-										<Input
-											id="date"
-											placeholder="e.g. Autumn 2025"
-											value={formData.date}
-											onChange={(e) =>
-												setFormData({ ...formData, date: e.target.value })
-											}
-											required
-											disabled={isLoading}
+										<DateInput
+											selectedDate={startDate}
+											onDateChange={setStartDate}
 										/>
 									</div>
 
@@ -218,6 +211,22 @@ export default function NewEventPage() {
 										Upload a cover image for the event (max 10MB). You can add
 										more photos after creating the event.
 									</p>
+								</div>
+
+								<div className="flex items-center gap-3">
+									<input
+										id="featured"
+										type="checkbox"
+										checked={formData.featured}
+										onChange={(e) =>
+											setFormData({ ...formData, featured: e.target.checked })
+										}
+										disabled={isLoading}
+										className="w-4 h-4 cursor-pointer"
+									/>
+									<Label htmlFor="featured" className="cursor-pointer">
+										Mark as Featured Event
+									</Label>
 								</div>
 
 								<div className="flex gap-4 pt-4">

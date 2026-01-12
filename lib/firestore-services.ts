@@ -15,10 +15,13 @@ import type { PastEvent, GalleryItem } from "./events";
 
 const EVENTS_COLLECTION = "events";
 
-// Convert Firestore timestamp to date string
-function timestampToDateString(timestamp: Timestamp): string {
-	const date = timestamp.toDate();
-	return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+// Convert Firestore timestamp to ISO date string (YYYY-MM-DD)
+function convertFirestoreDate(date: Timestamp | string): string {
+	if (date instanceof Timestamp) {
+		const jsDate = date.toDate();
+		return jsDate.toISOString().split("T")[0];
+	}
+	return date;
 }
 
 // Create a new event
@@ -51,11 +54,12 @@ export async function getAllEventsFromFirestore(): Promise<PastEvent[]> {
 			events.push({
 				id: doc.id,
 				title: data.title,
-				date: data.date,
+				date: convertFirestoreDate(data.date),
 				location: data.location,
 				thumbnail: data.thumbnail,
 				description: data.description,
 				items: data.items || [],
+				featured: data.featured || false,
 			});
 		});
 
@@ -80,7 +84,7 @@ export async function getEventById(eventId: string): Promise<PastEvent | null> {
 		return {
 			id: eventDoc.id,
 			title: data.title,
-			date: data.date,
+			date: convertFirestoreDate(data.date),
 			location: data.location,
 			thumbnail: data.thumbnail,
 			description: data.description,
