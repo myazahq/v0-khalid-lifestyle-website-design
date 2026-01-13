@@ -14,6 +14,8 @@ export default async function Home() {
 		type: "image" | "video";
 		src: string;
 	}[];
+
+	console.log("Home page events data:", eventsData);
 	return (
 		<main className="min-h-screen bg-black">
 			<Navbar />
