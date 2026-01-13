@@ -8,12 +8,19 @@ import { formatDateString } from "@/lib/utils";
 export const UpcomingEvents: React.FC<{ eventsData: PastEvent[] }> = ({
 	eventsData,
 }) => {
-	const upcomingEvents = eventsData.filter((event) => {
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		const eventDate = new Date(String(event.date));
-		return eventDate >= today;
-	});
+	const upcomingEvents = eventsData
+		.filter((event) => {
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			const eventDate = new Date(String(event.date));
+			return eventDate >= today;
+		})
+		.sort((a, b) => {
+			// Featured events first
+			if (a.featured && !b.featured) return -1;
+			if (!a.featured && b.featured) return 1;
+			return 0;
+		});
 
 	return (
 		<section id="events" className="py-24 px-6 md:px-12 bg-[#050505]">
