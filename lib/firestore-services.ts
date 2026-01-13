@@ -10,6 +10,7 @@ import {
 	orderBy,
 	Timestamp,
 } from "firebase/firestore";
+import { unstable_cache as cache } from "next/cache";
 import { db } from "./firebase";
 import type { PastEvent, GalleryItem } from "./events";
 
@@ -41,8 +42,8 @@ export async function createEvent(eventData: Omit<PastEvent, "id" | "items">) {
 	}
 }
 
-// Get all events
-export async function getAllEventsFromFirestore(): Promise<PastEvent[]> {
+// Get all events - cached with tag for revalidation
+async function _getAllEventsFromFirestore(): Promise<PastEvent[]> {
 	try {
 		const eventsRef = collection(db, EVENTS_COLLECTION);
 		const q = query(eventsRef, orderBy("createdAt", "desc"));
@@ -70,8 +71,17 @@ export async function getAllEventsFromFirestore(): Promise<PastEvent[]> {
 	}
 }
 
-// Get a single event by ID
-export async function getEventById(eventId: string): Promise<PastEvent | null> {
+export const getAllEventsFromFirestore = cache(
+	_getAllEventsFromFirestore,
+	["all-events"],
+	{
+		revalidate: 10, // 10 seconds for real-time updates
+		tags: ["events"],
+	}
+);
+
+// Get a single event by ID - cached with tag
+async function _getEventById(eventId: string): Promise<PastEvent | null> {
 	try {
 		const eventRef = doc(db, EVENTS_COLLECTION, eventId);
 		const eventDoc = await getDoc(eventRef);
@@ -95,6 +105,11 @@ export async function getEventById(eventId: string): Promise<PastEvent | null> {
 		return null;
 	}
 }
+
+export const getEventById = cache(_getEventById, ["event-by-id"], {
+	revalidate: 10, // 10 seconds for real-time updates
+	tags: ["events"],
+});
 
 // Update an event
 export async function updateEvent(
