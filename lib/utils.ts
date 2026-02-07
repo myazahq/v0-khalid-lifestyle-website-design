@@ -19,11 +19,18 @@ export function formatFirestoreTimestamp(timestamp: Timestamp): string {
 }
 
 export const formatDateString = (dateStr: string): string => {
-  const [year, month, day] = dateStr.split("-");
-  const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-  return date.toLocaleDateString("en-US", {
-	year: "numeric",
-	month: "long",
-	day: "numeric",
-  });
+	const [year, month, day] = dateStr.split("-");
+	const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+	return date.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+};
+
+export const withCloudinaryAutoFormat = (url?: string): string | undefined => {
+	if (!url) return url;
+	if (!url.includes("/image/upload/")) return url;
+	if (url.includes("/image/upload/f_auto")) return url;
+	return url.replace("/image/upload/", "/image/upload/f_auto,q_auto/");
 };

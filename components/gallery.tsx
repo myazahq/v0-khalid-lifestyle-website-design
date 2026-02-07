@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { PastEvent } from "@/lib/events";
-import { formatDateString } from "@/lib/utils";
+import { formatDateString, withCloudinaryAutoFormat } from "@/lib/utils";
 
 export const Gallery: React.FC<{ eventsData: PastEvent[] }> = ({
 	eventsData,
@@ -51,7 +51,10 @@ export const Gallery: React.FC<{ eventsData: PastEvent[] }> = ({
 							>
 								<div className="relative aspect-4/5 overflow-hidden border border-white/5 bg-white/5 mb-6">
 									<Image
-										src={event.thumbnail || "/placeholder.svg"}
+										src={
+											withCloudinaryAutoFormat(event.thumbnail) ||
+											"/placeholder.svg"
+										}
 										alt={event.title}
 										fill
 										className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"

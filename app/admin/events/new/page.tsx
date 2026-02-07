@@ -37,18 +37,47 @@ export default function NewEventPage() {
 	const [error, setError] = useState<string>("");
 	const [startDate, setStartDate] = useState<Date | null>(new Date());
 
-	const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const isHeicFile = (file: File) => {
+		const isHeicMime = file.type === "image/heic" || file.type === "image/heif";
+		const isHeicExt = /\.(heic|heif)$/i.test(file.name);
+		return isHeicMime || isHeicExt;
+	};
+
+	const convertHeicToJpeg = async (file: File) => {
+		const heic2any = (await import("heic2any")).default;
+		const output = await heic2any({
+			blob: file,
+			toType: "image/jpeg",
+			quality: 0.9,
+		});
+		const blob = Array.isArray(output) ? output[0] : output;
+		const newName = file.name.replace(/\.(heic|heif)$/i, ".jpg");
+		return new File([blob], newName, { type: "image/jpeg" });
+	};
+
+	const handleThumbnailChange = async (
+		e: React.ChangeEvent<HTMLInputElement>,
+	) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
-		const validation = validateFileSize(file);
+		let processedFile = file;
+		try {
+			processedFile = isHeicFile(file) ? await convertHeicToJpeg(file) : file;
+		} catch (err) {
+			console.error("[v0] HEIC conversion failed:", err);
+			setError("Failed to convert HEIC image. Please try a different file.");
+			return;
+		}
+
+		const validation = validateFileSize(processedFile);
 		if (!validation.valid) {
 			setError(validation.message || "Invalid file");
 			return;
 		}
 
-		setThumbnailFile(file);
-		setThumbnailPreview(URL.createObjectURL(file));
+		setThumbnailFile(processedFile);
+		setThumbnailPreview(URL.createObjectURL(processedFile));
 		setError("");
 	};
 

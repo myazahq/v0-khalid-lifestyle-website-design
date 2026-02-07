@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type { PastEvent } from "@/lib/events";
 import { getEventById, deleteEvent } from "@/lib/firestore-services";
-import { formatDateString } from "@/lib/utils";
+import { formatDateString, withCloudinaryAutoFormat } from "@/lib/utils";
 import { Timestamp } from "firebase/firestore";
 
 export default function EventDetailPage() {
@@ -164,7 +164,10 @@ export default function EventDetailPage() {
 										>
 											{item.type === "image" ? (
 												<img
-													src={item.src || "/placeholder.svg"}
+													src={
+														withCloudinaryAutoFormat(item.src) ||
+														"/placeholder.svg"
+													}
 													alt={`Media ${index + 1}`}
 													className="w-full h-full object-cover"
 												/>
@@ -199,7 +202,10 @@ export default function EventDetailPage() {
 									Thumbnail
 								</p>
 								<img
-									src={event.thumbnail || "/placeholder.svg"}
+									src={
+										withCloudinaryAutoFormat(event.thumbnail) ||
+										"/placeholder.svg"
+									}
 									alt={event.title}
 									className="mt-2 w-48 h-32 object-cover rounded-lg"
 								/>

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { formatDateString } from "@/lib/utils";
+import { formatDateString, withCloudinaryAutoFormat } from "@/lib/utils";
 
 export default function EventGalleryPage() {
 	const params = useParams();
@@ -82,20 +82,22 @@ export default function EventGalleryPage() {
 							>
 								{item.type === "image" ? (
 									<Image
-										src={item.src || "/placeholder.svg"}
+										src={
+											withCloudinaryAutoFormat(item.src) || "/placeholder.svg"
+										}
 										alt={`${event.title} photo ${i}`}
 										width={800}
 										height={
 											item.aspect === "portrait"
 												? 1200
 												: item.aspect === "landscape"
-												? 450
-												: 800
+													? 450
+													: 800
 										}
 										className="w-full object-cover transition-all duration-700 group-hover:scale-110"
 										unoptimized={
-											item.src.startsWith("http") ||
-											item.src.includes("placeholder")
+											(item.src || "").startsWith("http") ||
+											(item.src || "").includes("placeholder")
 										}
 									/>
 								) : (

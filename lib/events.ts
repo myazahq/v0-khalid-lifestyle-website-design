@@ -67,6 +67,12 @@ const pastEvents: PastEvent[] = [
 import { Timestamp } from "firebase/firestore";
 import { getAllEventsFromFirestore } from "./firestore-services";
 
+// Utility function to randomly pick n items from an array
+function pickRandom<T>(arr: T[], count: number): T[] {
+	const shuffled = [...arr].sort(() => Math.random() - 0.5);
+	return shuffled.slice(0, Math.min(count, arr.length));
+}
+
 export async function getAllEvents(): Promise<PastEvent[]> {
 	// Fetch from Firestore
 	const firestoreEvents = await getAllEventsFromFirestore();
@@ -83,12 +89,13 @@ export async function getHeroMedia() {
 	const allEvents = await getAllEvents();
 	const allMedia: { type: "image" | "video"; src: string }[] = [];
 
-	// Get first 3 images from each event
+	// Get random 3 images from each event
 	allEvents.forEach((event) => {
-		const images = event.items
-			.filter((item) => item.type === "image")
-			.slice(0, 3);
-		images.forEach((img) => allMedia.push({ type: "image", src: img.src }));
+		const images = event.items.filter((item) => item.type === "image");
+		const randomImages = pickRandom(images, 3);
+		randomImages.forEach((img) =>
+			allMedia.push({ type: "image", src: img.src })
+		);
 	});
 
 	// Get videos from each event

@@ -14,7 +14,11 @@ import { PlusCircle } from "lucide-react";
 import { getAllEventsFromFirestore } from "@/lib/firestore-services";
 import type { PastEvent } from "@/lib/events";
 import { AdminSidebar } from "@/components/admin-sidebar";
-import { formatDateString, Timestamp } from "@/lib/utils";
+import {
+	formatDateString,
+	Timestamp,
+	withCloudinaryAutoFormat,
+} from "@/lib/utils";
 
 export default function AdminDashboard() {
 	const [events, setEvents] = useState<PastEvent[]>([]);
@@ -33,7 +37,7 @@ export default function AdminDashboard() {
 	const totalEvents = events.length;
 	const totalPhotos = events.reduce(
 		(sum, event) => sum + event.items.length,
-		0
+		0,
 	);
 
 	return (
@@ -116,7 +120,10 @@ export default function AdminDashboard() {
 											<Link key={event.id} href={`/admin/events/${event.id}`}>
 												<div className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors">
 													<img
-														src={event.thumbnail || "/placeholder.svg"}
+														src={
+															withCloudinaryAutoFormat(event.thumbnail) ||
+															"/placeholder.svg"
+														}
 														alt={event.title}
 														className="w-16 h-16 rounded object-cover"
 													/>
