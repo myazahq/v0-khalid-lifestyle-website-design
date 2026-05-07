@@ -6,9 +6,13 @@ import { BookingForm } from "@/components/booking-form";
 import { Footer } from "@/components/footer";
 import { getHeroMedia } from "@/lib/events";
 import { getAllEventsFromFirestore } from "@/lib/firestore-services";
+import { getSiteSettings } from "@/lib/settings-services";
 
 export default async function Home() {
-	const eventsData = await getAllEventsFromFirestore();
+	const [eventsData, settings] = await Promise.all([
+		getAllEventsFromFirestore(),
+		getSiteSettings(),
+	]);
 
 	const media = (await getHeroMedia()) as {
 		type: "image" | "video";
@@ -42,10 +46,14 @@ export default async function Home() {
 			</div>
 			<Gallery eventsData={eventsData} />
 			<div id="booking">
-				<BookingForm />
+				<BookingForm
+					instagramHandle={settings.instagramHandle}
+					instagramUrl={settings.instagramUrl}
+					contactEmail={settings.contactEmail}
+				/>
 			</div>
 
-			<Footer />
+			<Footer settings={settings} />
 		</main>
 	);
 }

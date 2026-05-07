@@ -54,7 +54,9 @@ export default function AdminRsvpListPage() {
 		load();
 	}, [id]);
 
-	const filtered = rsvps.filter(r => filter === "all" || r.status === filter);
+	const filtered = rsvps
+		.filter(r => filter === "all" || r.status === filter)
+		.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 	const confirmed = rsvps.filter(r => r.status === "confirmed");
 	const cancelled = rsvps.filter(r => r.status === "cancelled");
 	const totalGuests = confirmed.reduce((sum, r) => sum + r.numberOfGuests, 0);

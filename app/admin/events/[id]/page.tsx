@@ -9,7 +9,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, Trash2, Plus, Users, Link2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Users, Link2, ExternalLink, Copy, Check } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type { PastEvent } from "@/lib/events";
@@ -24,6 +24,15 @@ export default function EventDetailPage() {
 	const [event, setEvent] = useState<PastEvent | null>(null);
 	const [confirmedRsvps, setConfirmedRsvps] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
+	const [copied, setCopied] = useState(false);
+
+	const copyRsvpLink = (slug: string) => {
+		const url = `${window.location.origin}/events/${slug}`;
+		navigator.clipboard.writeText(url).then(() => {
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		});
+	};
 
 	useEffect(() => {
 		async function fetchEvent() {
@@ -136,6 +145,13 @@ export default function EventDetailPage() {
 										</CardDescription>
 									</div>
 									<div className="flex gap-2">
+										<Button variant="outline" size="sm" onClick={() => copyRsvpLink(event.slug!)}>
+											{copied ? (
+												<><Check className="mr-2 h-3.5 w-3.5 text-green-500" /><span className="text-green-500">Copied!</span></>
+											) : (
+												<><Copy className="mr-2 h-3.5 w-3.5" />Copy RSVP Link</>
+											)}
+										</Button>
 										<Link href={`/events/${event.slug}`} target="_blank">
 											<Button variant="outline" size="sm">
 												<ExternalLink className="mr-2 h-3.5 w-3.5" />

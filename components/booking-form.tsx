@@ -12,7 +12,13 @@ import { OCCASION_LABELS, TIME_SLOTS } from "@/lib/reservation-types";
 
 const OCCASIONS = Object.entries(OCCASION_LABELS) as [OccasionType, string][];
 
-export function BookingForm() {
+interface BookingFormProps {
+  instagramHandle?: string;
+  instagramUrl?: string;
+  contactEmail?: string;
+}
+
+export function BookingForm({ instagramHandle = "@KhalidLifestyle", instagramUrl = "#", contactEmail = "events@khalidlifestyle.com" }: BookingFormProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [submitted, setSubmitted] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -80,7 +86,7 @@ export function BookingForm() {
 					</p>
 
 					<div className="space-y-8">
-						<div className="flex items-center gap-6 group">
+						<a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 group">
 							<div className="w-12 h-12 flex items-center justify-center border border-white/10 group-hover:border-gold transition-colors">
 								<Instagram size={18} />
 							</div>
@@ -89,11 +95,11 @@ export function BookingForm() {
 									Follow Us
 								</p>
 								<p className="text-sm tracking-widest group-hover:text-gold transition-colors">
-									@KhalidLifestyle
+									{instagramHandle}
 								</p>
 							</div>
-						</div>
-						<div className="flex items-center gap-6 group">
+						</a>
+						<a href={`mailto:${contactEmail}`} className="flex items-center gap-6 group">
 							<div className="w-12 h-12 flex items-center justify-center border border-white/10 group-hover:border-gold transition-colors">
 								<Mail size={18} />
 							</div>
@@ -102,10 +108,10 @@ export function BookingForm() {
 									Email
 								</p>
 								<p className="text-sm tracking-widest group-hover:text-gold transition-colors">
-									events@khalidlifestyle.com
+									{contactEmail}
 								</p>
 							</div>
-						</div>
+						</a>
 					</div>
 				</div>
 
