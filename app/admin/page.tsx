@@ -13,7 +13,6 @@ import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import { getAllEventsFromFirestore } from "@/lib/firestore-services";
 import type { PastEvent } from "@/lib/events";
-import { AdminSidebar } from "@/components/admin-sidebar";
 import {
 	formatDateString,
 	Timestamp,
@@ -41,14 +40,8 @@ export default function AdminDashboard() {
 	);
 
 	return (
-		<div className="min-h-screen bg-background">
-			<div className="flex">
-				{/* Sidebar */}
-				<AdminSidebar />
-
-				{/* Main Content */}
-				<main className="flex-1 p-8">
-					<div className="max-w-7xl mx-auto">
+		<div className="flex-1 p-8">
+			<div className="max-w-7xl mx-auto">
 						<div className="flex items-center justify-between mb-8">
 							<div>
 								<h2 className="text-3xl font-serif font-bold">Dashboard</h2>
@@ -144,9 +137,7 @@ export default function AdminDashboard() {
 								)}
 							</CardContent>
 						</Card>
-					</div>
-				</main>
-			</div>
+				</div>
 		</div>
 	);
 }

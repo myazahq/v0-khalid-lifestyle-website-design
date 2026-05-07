@@ -13,6 +13,9 @@ export interface PastEvent {
 	description: string;
 	items: GalleryItem[];
 	featured?: boolean;
+	slug?: string;
+	tableLimit?: number;
+	rsvpEnabled?: boolean;
 }
 
 const pastEvents: PastEvent[] = [

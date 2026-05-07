@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AdminSidebar } from "@/components/admin-sidebar";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -10,11 +9,12 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Users, Link2, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type { PastEvent } from "@/lib/events";
 import { getEventById, deleteEvent } from "@/lib/firestore-services";
+import { getConfirmedRsvpCount } from "@/lib/rsvp-services";
 import { formatDateString, withCloudinaryAutoFormat } from "@/lib/utils";
 import { Timestamp } from "firebase/firestore";
 
@@ -22,13 +22,18 @@ export default function EventDetailPage() {
 	const params = useParams();
 	const router = useRouter();
 	const [event, setEvent] = useState<PastEvent | null>(null);
+	const [confirmedRsvps, setConfirmedRsvps] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		async function fetchEvent() {
 			const eventId = params.id as string;
-			const fetchedEvent = await getEventById(eventId);
+			const [fetchedEvent, rsvpCount] = await Promise.all([
+				getEventById(eventId),
+				getConfirmedRsvpCount(eventId),
+			]);
 			setEvent(fetchedEvent);
+			setConfirmedRsvps(rsvpCount);
 			setIsLoading(false);
 		}
 
@@ -48,37 +53,28 @@ export default function EventDetailPage() {
 
 	if (isLoading) {
 		return (
-			<div className="flex min-h-screen bg-background">
-				<AdminSidebar />
-				<main className="flex-1 flex items-center justify-center">
-					<p className="text-muted-foreground">Loading...</p>
-				</main>
+			<div className="flex-1 flex items-center justify-center">
+				<p className="text-muted-foreground">Loading...</p>
 			</div>
 		);
 	}
 
 	if (!event) {
 		return (
-			<div className="flex min-h-screen bg-background">
-				<AdminSidebar />
-				<main className="flex-1 flex items-center justify-center">
-					<div className="text-center">
-						<h2 className="text-2xl font-bold mb-2">Event Not Found</h2>
-						<Link href="/admin">
-							<Button>Back to Dashboard</Button>
-						</Link>
-					</div>
-				</main>
+			<div className="flex-1 flex items-center justify-center">
+				<div className="text-center">
+					<h2 className="text-2xl font-bold mb-2">Event Not Found</h2>
+					<Link href="/admin">
+						<Button>Back to Dashboard</Button>
+					</Link>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex min-h-screen bg-background">
-			<AdminSidebar />
-
-			<main className="flex-1 p-8">
-				<div className="max-w-6xl mx-auto">
+		<div className="flex-1 p-8">
+			<div className="max-w-6xl mx-auto">
 					<div className="flex items-center gap-4 mb-8">
 						<Link href="/admin">
 							<Button variant="ghost" size="icon">
@@ -125,6 +121,60 @@ export default function EventDetailPage() {
 							</CardHeader>
 						</Card>
 					</div>
+
+					{event.slug && (
+						<Card className="mb-8">
+							<CardHeader>
+								<div className="flex items-center justify-between">
+									<div>
+										<CardTitle className="flex items-center gap-2">
+											<Users className="h-5 w-5" /> RSVPs
+										</CardTitle>
+										<CardDescription>
+											{confirmedRsvps} confirmed
+											{event.tableLimit ? ` · ${event.tableLimit} total capacity` : ""}
+										</CardDescription>
+									</div>
+									<div className="flex gap-2">
+										<Link href={`/events/${event.slug}`} target="_blank">
+											<Button variant="outline" size="sm">
+												<ExternalLink className="mr-2 h-3.5 w-3.5" />
+												View RSVP Page
+											</Button>
+										</Link>
+										<Link href={`/admin/events/${event.id}/rsvps`}>
+											<Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+												<Users className="mr-2 h-3.5 w-3.5" />
+												Manage RSVPs
+											</Button>
+										</Link>
+									</div>
+								</div>
+							</CardHeader>
+							{event.tableLimit !== undefined && (
+								<CardContent>
+									<div className="flex items-center justify-between text-sm mb-2">
+										<span className="text-muted-foreground">Capacity</span>
+										<span>{confirmedRsvps} / {event.tableLimit}</span>
+									</div>
+									<div className="h-2 bg-muted rounded-full overflow-hidden">
+										<div
+											className="h-full bg-primary transition-all"
+											style={{ width: `${Math.min(100, (confirmedRsvps / event.tableLimit) * 100)}%` }}
+										/>
+									</div>
+								</CardContent>
+							)}
+							{!event.tableLimit && (
+								<CardContent>
+									<div className="flex items-center gap-2 text-sm text-muted-foreground">
+										<Link2 className="h-4 w-4" />
+										<span>Shareable link: <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/events/{event.slug}</code></span>
+									</div>
+								</CardContent>
+							)}
+						</Card>
+					)}
 
 					<Card>
 						<CardHeader>
@@ -212,8 +262,7 @@ export default function EventDetailPage() {
 							</div>
 						</CardContent>
 					</Card>
-				</div>
-			</main>
+			</div>
 		</div>
 	);
 }

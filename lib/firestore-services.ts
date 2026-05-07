@@ -10,6 +10,8 @@ import {
 	deleteDoc,
 	query,
 	orderBy,
+	where,
+	limit,
 	Timestamp,
 } from "firebase/firestore";
 import { unstable_cache as cache } from "next/cache";
@@ -44,6 +46,34 @@ export async function createEvent(eventData: Omit<PastEvent, "id" | "items">) {
 	}
 }
 
+// Get event by slug
+export async function getEventBySlug(slug: string): Promise<PastEvent | null> {
+	try {
+		const eventsRef = collection(db, EVENTS_COLLECTION);
+		const q = query(eventsRef, where("slug", "==", slug), limit(1));
+		const snapshot = await getDocs(q);
+		if (snapshot.empty) return null;
+		const docSnap = snapshot.docs[0];
+		const data = docSnap.data();
+		return {
+			id: docSnap.id,
+			title: data.title,
+			date: convertFirestoreDate(data.date),
+			location: data.location,
+			thumbnail: data.thumbnail,
+			description: data.description,
+			items: data.items || [],
+			featured: data.featured || false,
+			slug: data.slug,
+			tableLimit: data.tableLimit,
+			rsvpEnabled: data.rsvpEnabled ?? true,
+		};
+	} catch (error) {
+		console.error("[v0] Error fetching event by slug:", error);
+		return null;
+	}
+}
+
 // Get all events - cached with tag for revalidation
 async function _getAllEventsFromFirestore(): Promise<PastEvent[]> {
 	try {
@@ -63,6 +93,9 @@ async function _getAllEventsFromFirestore(): Promise<PastEvent[]> {
 				description: data.description,
 				items: data.items || [],
 				featured: data.featured || false,
+				slug: data.slug,
+				tableLimit: data.tableLimit,
+				rsvpEnabled: data.rsvpEnabled ?? true,
 			});
 		});
 
@@ -101,6 +134,10 @@ async function _getEventById(eventId: string): Promise<PastEvent | null> {
 			thumbnail: data.thumbnail,
 			description: data.description,
 			items: data.items || [],
+			featured: data.featured || false,
+			slug: data.slug,
+			tableLimit: data.tableLimit,
+			rsvpEnabled: data.rsvpEnabled ?? true,
 		};
 	} catch (error) {
 		console.error("[v0] Error fetching event:", error);

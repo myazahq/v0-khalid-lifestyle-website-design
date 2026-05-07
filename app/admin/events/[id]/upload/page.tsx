@@ -3,7 +3,6 @@
 import type React from "react";
 
 import { useState } from "react";
-import { AdminSidebar } from "@/components/admin-sidebar";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -142,11 +141,8 @@ export default function UploadMediaPage() {
 	};
 
 	return (
-		<div className="flex min-h-screen bg-background">
-			<AdminSidebar />
-
-			<main className="flex-1 p-8">
-				<div className="max-w-4xl mx-auto">
+		<div className="flex-1 p-8">
+			<div className="max-w-4xl mx-auto">
 					<div className="flex items-center gap-4 mb-8">
 						<Link href={`/admin/events/${params.id}`}>
 							<Button variant="ghost" size="icon" disabled={isUploading}>
@@ -285,8 +281,7 @@ export default function UploadMediaPage() {
 							</Link>
 						</div>
 					</form>
-				</div>
-			</main>
+			</div>
 		</div>
 	);
 }

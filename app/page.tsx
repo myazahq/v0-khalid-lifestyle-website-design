@@ -37,9 +37,13 @@ export default async function Home() {
 				</div>
 			</section>
 
-			<UpcomingEvents eventsData={eventsData} />
+			<div id="upcoming-events">
+				<UpcomingEvents eventsData={eventsData} />
+			</div>
 			<Gallery eventsData={eventsData} />
-			<BookingForm />
+			<div id="booking">
+				<BookingForm />
+			</div>
 
 			<Footer />
 		</main>

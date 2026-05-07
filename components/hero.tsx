@@ -110,11 +110,15 @@ const Hero = ({ media }: HeroProps) => {
 					<Button
 						variant="outline"
 						className="rounded-none border-white/20 px-10 py-6 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all w-full md:w-auto bg-transparent"
+						asChild
 					>
-						View Upcoming Events
+						<a href="#upcoming-events">View Upcoming Events</a>
 					</Button>
-					<Button className="rounded-none bg-gold text-black hover:bg-gold/90 px-10 py-6 text-xs uppercase tracking-widest w-full md:w-auto">
-						Book Exclusive Table
+					<Button
+						className="rounded-none bg-gold text-black hover:bg-gold/90 px-10 py-6 text-xs uppercase tracking-widest w-full md:w-auto"
+						asChild
+					>
+						<a href="#booking">Book Exclusive Table</a>
 					</Button>
 				</motion.div>
 			</div>
