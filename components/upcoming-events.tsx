@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from "lucide-react";
@@ -76,9 +77,18 @@ export const UpcomingEvents: React.FC<{ eventsData: PastEvent[] }> = ({
 													{event.location}
 												</div>
 											</div>
-											<button className="w-fit px-8 py-3 bg-white text-black text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-gold transition-colors">
-												RSVP NOW
-											</button>
+											{event.slug && event.rsvpEnabled !== false ? (
+												<Link
+													href={`/events/${event.slug}`}
+													className="inline-block w-fit px-8 py-3 bg-white text-black text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-gold transition-colors"
+												>
+													RSVP NOW
+												</Link>
+											) : (
+												<button className="w-fit px-8 py-3 bg-white text-black text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-gold transition-colors">
+													RSVP NOW
+												</button>
+											)}
 										</div>
 									</CardContent>
 								</Card>

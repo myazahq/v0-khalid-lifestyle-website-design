@@ -3,7 +3,6 @@
 import type React from "react";
 
 import { useState } from "react";
-import { AdminSidebar } from "@/components/admin-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +29,9 @@ export default function NewEventPage() {
 		location: "",
 		description: "",
 		featured: false,
+		slug: "",
+		tableLimit: "",
+		rsvpEnabled: true,
 	});
 	const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 	const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
@@ -87,11 +89,14 @@ export default function NewEventPage() {
 		setError("");
 
 		try {
-			// Create slug for event ID
-			const slug = formData.title
-				.toLowerCase()
-				.replace(/[^a-z0-9]+/g, "-")
-				.replace(/^-|-$/g, "");
+			// Generate slug from custom input or derive from title
+			const baseSlug = formData.slug.trim() ||
+				formData.title
+					.toLowerCase()
+					.replace(/[^a-z0-9]+/g, "-")
+					.replace(/^-|-$/g, "");
+			const randomSuffix = Math.random().toString(36).substring(2, 8);
+			const slug = formData.slug.trim() ? baseSlug : `${baseSlug}-${randomSuffix}`;
 
 			// Upload thumbnail if provided
 			let thumbnailUrl = "";
@@ -111,6 +116,9 @@ export default function NewEventPage() {
 				description: formData.description,
 				thumbnail: thumbnailUrl,
 				featured: formData.featured,
+				slug,
+				tableLimit: formData.tableLimit ? Number(formData.tableLimit) : undefined,
+				rsvpEnabled: formData.rsvpEnabled,
 			});
 			if (!result.success) {
 				throw new Error("Failed to create event");
@@ -126,11 +134,8 @@ export default function NewEventPage() {
 	};
 
 	return (
-		<div className="flex min-h-screen bg-background">
-			<AdminSidebar />
-
-			<main className="flex-1 p-8">
-				<div className="max-w-3xl mx-auto">
+		<div className="flex-1 p-8">
+			<div className="max-w-3xl mx-auto">
 					<div className="flex items-center gap-4 mb-8">
 						<Link href="/admin">
 							<Button variant="ghost" size="icon">
@@ -217,6 +222,48 @@ export default function NewEventPage() {
 									/>
 								</div>
 
+								<div className="grid gap-6 md:grid-cols-2">
+									<div className="space-y-2">
+										<Label htmlFor="slug">
+											Custom RSVP Link Slug
+											<span className="ml-2 text-muted-foreground text-xs font-normal">(optional)</span>
+										</Label>
+										<Input
+											id="slug"
+											placeholder="e.g. vip-night-london"
+											value={formData.slug}
+											onChange={(e) =>
+												setFormData({
+													...formData,
+													slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""),
+												})
+											}
+											disabled={isLoading}
+										/>
+										<p className="text-xs text-muted-foreground">
+											Shareable link: /events/<strong>{formData.slug || "auto-generated"}</strong>
+										</p>
+									</div>
+
+									<div className="space-y-2">
+										<Label htmlFor="tableLimit">
+											Table / RSVP Limit
+											<span className="ml-2 text-muted-foreground text-xs font-normal">(optional — unlimited if blank)</span>
+										</Label>
+										<Input
+											id="tableLimit"
+											type="number"
+											min="1"
+											placeholder="e.g. 50"
+											value={formData.tableLimit}
+											onChange={(e) =>
+												setFormData({ ...formData, tableLimit: e.target.value })
+											}
+											disabled={isLoading}
+										/>
+									</div>
+								</div>
+
 								<div className="space-y-2">
 									<Label htmlFor="thumbnail">Thumbnail Image</Label>
 									<div className="flex items-center gap-4">
@@ -280,8 +327,7 @@ export default function NewEventPage() {
 							</form>
 						</CardContent>
 					</Card>
-				</div>
-			</main>
+			</div>
 		</div>
 	);
 }
