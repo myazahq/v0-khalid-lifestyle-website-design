@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Calendar, TicketCheck, BookOpen, ImageIcon, Settings, Home, LogOut, User } from "lucide-react"
+import { Calendar, Users, UtensilsCrossed, ImageIcon, Settings, Home, LogOut, User } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 export function AdminSidebar() {
@@ -10,8 +10,8 @@ export function AdminSidebar() {
 
   const navItems = [
     { name: "Events", href: "/admin", icon: Calendar, exact: true },
-    { name: "Event RSVPs", href: "/admin/all-rsvps", icon: TicketCheck, exact: false },
-    { name: "Reservations", href: "/admin/reservations", icon: BookOpen, exact: false },
+    { name: "Guest Lists", href: "/admin/all-rsvps", icon: Users, exact: false },
+    { name: "Table Bookings", href: "/admin/reservations", icon: UtensilsCrossed, exact: false },
     { name: "Gallery", href: "/admin/gallery", icon: ImageIcon, exact: false },
     { name: "Settings", href: "/admin/settings", icon: Settings, exact: false },
   ]

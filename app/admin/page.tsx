@@ -10,7 +10,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Copy, Check } from "lucide-react";
 import { getAllEventsFromFirestore } from "@/lib/firestore-services";
 import type { PastEvent } from "@/lib/events";
 import {
@@ -22,6 +22,17 @@ import {
 export default function AdminDashboard() {
 	const [events, setEvents] = useState<PastEvent[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [copiedId, setCopiedId] = useState<string | null>(null);
+
+	const copyRsvpLink = (e: React.MouseEvent, event: PastEvent) => {
+		e.preventDefault();
+		if (!event.slug) return;
+		const url = `${window.location.origin}/events/${event.slug}`;
+		navigator.clipboard.writeText(url).then(() => {
+			setCopiedId(event.id);
+			setTimeout(() => setCopiedId(null), 2000);
+		});
+	};
 
 	useEffect(() => {
 		async function fetchEvents() {
@@ -127,8 +138,23 @@ export default function AdminDashboard() {
 															{event.location}
 														</p>
 													</div>
-													<div className="text-sm text-muted-foreground">
-														{event.items.length} media
+													<div className="flex items-center gap-3">
+														{event.slug && (
+															<button
+																onClick={(e) => copyRsvpLink(e, event)}
+																className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors px-2 py-1 border border-border hover:border-primary/50 rounded"
+																title="Copy RSVP link"
+															>
+																{copiedId === event.id ? (
+																	<><Check className="h-3.5 w-3.5 text-green-500" /><span className="text-green-500">Copied</span></>
+																) : (
+																	<><Copy className="h-3.5 w-3.5" /><span>Copy link</span></>
+																)}
+															</button>
+														)}
+														<div className="text-sm text-muted-foreground">
+															{event.items.length} media
+														</div>
 													</div>
 												</div>
 											</Link>
